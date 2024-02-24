@@ -3,6 +3,15 @@ use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion;
+use rand::Rng;
+
+
+enum CurrentScreen {
+    SplashScreen,
+    Leaderboard,
+    Game
+}
+
 
 fn main() {
     let stdin = stdin();
@@ -31,7 +40,7 @@ fn show_splash_screen() {
         .unwrap();
 
         match c.unwrap() {
-            Key::Char(' ') => println!("Space was pressed!"),
+            Key::Char(' ') => start_game(),
             Key::Char('q') => break,
             Key::Char('l') => println!("Show the leaderboard here :--)"),
             _ => (),
@@ -41,5 +50,19 @@ fn show_splash_screen() {
 }
 
 fn start_game() {
-    termion::
+    termion::clear::All;
+    let mut i = 0;
+    while i < 1000 {
+        let mut stdout = std::io::stdout().into_raw_mode().unwrap();
+        write!(stdout, r#"{}{}"#, termion::cursor::Goto(1, i), random_number(0, 10))
+            .unwrap();
+        stdout.flush().unwrap();
+
+        i += 1;
+
+    }
+}
+
+fn random_number(min_num: i16, max_num: i16) -> i16 {
+    return rand::thread_rng().gen_range(min_num..max_num + 1);
 }
