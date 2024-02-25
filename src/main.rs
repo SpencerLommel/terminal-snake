@@ -1,9 +1,12 @@
 use std::io::{stdin, stdout, Write};
+use std::{time::{self, Duration}, thread};
+use std::ptr::write;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion;
 use rand::Rng;
+
 
 
 enum CurrentScreen {
@@ -12,13 +15,16 @@ enum CurrentScreen {
     Game
 }
 
+static mut CURRENT_SCREEN: CurrentScreen = CurrentScreen::Game;
+
 
 fn main() {
-    let stdin = stdin();
+    let _stdin = stdin();
     //setting up stdout and going into raw mode
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    let _stdout = stdout().into_raw_mode().unwrap();
     //printing welcoming message, clearing the screen and going to left top corner with the cursor
     show_splash_screen();
+
 }
 
 
@@ -50,19 +56,52 @@ fn show_splash_screen() {
 }
 
 fn start_game() {
-    termion::clear::All;
-    let mut i = 0;
-    while i < 1000 {
-        let mut stdout = std::io::stdout().into_raw_mode().unwrap();
-        write!(stdout, r#"{}{}"#, termion::cursor::Goto(1, i), random_number(0, 10))
+    let mut snake_head = vec![15, 10];
+    let mut stdout = std::io::stdout().into_raw_mode().unwrap();
+    let stdin = stdin();
+    write!(stdout, r#"{}{}{}  "#, termion::cursor::Goto(snake_head[0], snake_head[1]), termion::clear::All, termion::color::Bg(termion::color::Cyan))
+        .unwrap();
+
+    for c in stdin.keys() {
+        write!(
+            stdout,
+            r#"{}{}"#,
+            termion::clear::All,
+            termion::color::Bg(termion::color::Reset)
+
+        )
             .unwrap();
-        stdout.flush().unwrap();
-
-        i += 1;
-
     }
+
+
+
+
+    sleep(Duration::from_secs(2));
+    write!(stdout, r#"{}{}Unpaused"#, termion::cursor::Goto(1, 1), termion::clear::All)
+        .unwrap();
+    stdout.flush().unwrap();
+
+
+
+    // This clears all key presses and prevents program from using old key presses once game is over
+    // for _c in stdin.keys() {
+    //     match _c.unwrap() {
+    //         Key::Char('q') => break,
+    //         _ => ()
+    //     }
+    // }
 }
 
 fn random_number(min_num: i16, max_num: i16) -> i16 {
     return rand::thread_rng().gen_range(min_num..max_num + 1);
+}
+
+pub fn sleep(dur: Duration) {
+    std::io::stdout().flush().unwrap();
+    let ten_millis = time::Duration::from_millis(10);
+    let now = time::Instant::now();
+
+    thread::sleep(dur);
+
+    assert!(now.elapsed() >= ten_millis);
 }
