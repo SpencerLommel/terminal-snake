@@ -1,22 +1,15 @@
+use rand::Rng;
 use std::io::{stdin, stdout, Write};
-use std::{time::{self, Duration}, thread};
 use std::ptr::write;
+use std::{
+    thread,
+    time::{self, Duration},
+};
+use termion;
 use termion::event::Key;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
-use termion;
-use rand::Rng;
 use termion::{clear, color, cursor};
-
-
-enum CurrentScreen {
-    SplashScreen,
-    Leaderboard,
-    Game
-}
-
-static mut CURRENT_SCREEN: CurrentScreen = CurrentScreen::Game;
-
 
 fn main() {
     let _stdin = stdin();
@@ -24,9 +17,7 @@ fn main() {
     let _stdout = stdout().into_raw_mode().unwrap();
     //printing welcoming message, clearing the screen and going to left top corner with the cursor
     show_splash_screen();
-
 }
-
 
 fn show_splash_screen() {
     let stdin = stdin();
@@ -52,12 +43,10 @@ fn show_splash_screen() {
             _ => (),
         }
     }
-
 }
 
 fn start_game() {
     let mut stdout = stdout().into_raw_mode().unwrap();
-
 
     // Initial game setup
     let mut game_running = true;
@@ -70,7 +59,8 @@ fn start_game() {
         "{}{}  ",
         cursor::Goto(snake_head[0], snake_head[1]),
         color::Bg(color::Cyan)
-    ).unwrap();
+    )
+    .unwrap();
     stdout.flush().unwrap();
 
     while game_running {
@@ -102,7 +92,8 @@ fn start_game() {
             "{}{}",
             cursor::Goto(prev_head[0], prev_head[1]),
             color::Bg(color::Reset)
-        ).unwrap();
+        )
+        .unwrap();
 
         // Draw new snake head
         write!(
@@ -111,7 +102,8 @@ fn start_game() {
             cursor::Goto(snake_head[0], snake_head[1]),
             clear::CurrentLine,
             color::Bg(color::Cyan)
-        ).unwrap();
+        )
+        .unwrap();
 
         prev_head = snake_head.clone(); // Update for next frame
 
@@ -127,9 +119,11 @@ fn start_game() {
 // Helper enum for directions
 #[derive(PartialEq)]
 enum Direction {
-    Up, Down, Left, Right
+    Up,
+    Down,
+    Left,
+    Right,
 }
-
 
 fn random_number(min_num: i16, max_num: i16) -> i16 {
     return rand::thread_rng().gen_range(min_num..max_num + 1);
