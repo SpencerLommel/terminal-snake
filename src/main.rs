@@ -89,8 +89,9 @@ fn start_game() {
         // Clear the previous snake position
         write!(
             stdout,
-            "{}{}",
+            "{}{}{}",
             cursor::Goto(prev_head[0], prev_head[1]),
+            termion::cursor::Hide,
             color::Bg(color::Reset)
         )
         .unwrap();
@@ -98,10 +99,11 @@ fn start_game() {
         // Draw new snake head
         write!(
             stdout,
-            "{}{}{}  ",
+            "{}{}{}{}  ",
             cursor::Goto(snake_head[0], snake_head[1]),
             clear::CurrentLine,
-            color::Bg(color::Cyan)
+            color::Bg(color::Cyan),
+            termion::cursor::Hide
         )
         .unwrap();
 
